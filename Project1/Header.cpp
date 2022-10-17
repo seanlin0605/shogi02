@@ -1,25 +1,43 @@
-#include "Header.h"
+ï»¿#include "Header.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <conio.h>
 
-const char* text[16] = { "  ", "¥É", "­¸", "¨¤", "ª÷", "»È", "®Û", "­»", "¨B", "¦¨" ,"Às", "°¨" ,"¤ı" };
-const char* symbol[16] = { "¢z¢w¢w¢w¢w¢w", "¢s¢w¢w¢w¢w¢w", "¢s¢w¢w¢w¢w¢w¢{", "¢x", "¢u¢w¢w¢w¢w¢w", "¢q¢w¢w¢w¢w¢w", "¢q¢w¢w¢w¢w¢w¢t", "¢|¢w¢w¢w¢w¢w", "¢r¢w¢w¢w¢w¢w", "¢r¢w¢w¢w¢w¢w¢}" ,"¡µ", "¡¾", "¡¶", "¡¿", "¡»"};//¡¶¡µ¡¿¡¾¡»¡º
+const char* text[17] = { "  ", "ç‰", "é£›", "è§’", "é‡‘", "éŠ€", "æ¡‚", "é¦™", "æ­¥", "ç‹", "é¾", "é¦¬", "é‡‘", "å…¨", "åœ­", "æ", "æˆ" };
+const char* textp[16] = { "  ", "ç‹", "é¾", "é¦¬", "é‡‘", "å…¨", "åœ­", "æ", "ã¨" };
+const char* symbol[16] = { "â”Œâ”€â”€â”€â”€â”€", "â”¬â”€â”€â”€â”€â”€", "â”¬â”€â”€â”€â”€â”€â”", "â”‚", "â”œâ”€â”€â”€â”€â”€", "â”¼â”€â”€â”€â”€â”€", "â”¼â”€â”€â”€â”€â”€â”¤", "â””â”€â”€â”€â”€â”€", "â”´â”€â”€â”€â”€â”€", "â”´â”€â”€â”€â”€â”€â”˜" ,"â–³", "â–½", "â–²", "â–¼", "â—†"};//â–²â–³â–¼â–½â—†â—‡
 const char xKey[10] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P' };
 const char yKey[10] = { 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'};
 const char dirKey[10] = { 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/' };
+void* moveRule[10] = { gyokusho, hisha, kakugyo, kinsho, ginsho, keima, kyosha, fuhyo ,ryuo ,ryuma };//gyokusho, hisha, kakugyo, kinsho, ginsho, keima, kyosha, fuhyo ,ryuo ,ryuma
+bool moveMask[9][9] = {};
 char preview[9][9] = { };
 chessboard game[9][9];
 token tokens[40];
 select input;
 
-void move() {
-
+void gyokusho() {
+	const int tempPos[8][2] = { {1,1},{0,1} ,{-1,1} ,{-1,0} ,{-1,-1} ,{0,-1} ,{1,-1} ,{1,0} };
+	const char tempChar[8] = { '1','2','3','4','5','6','7','8' };// { 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',' };
+	for (int i = 0; i < 8; i++)
+		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
+			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = tempChar[i];
 }
+
+void hisha(){};
+void kakugyo(){};
+void kinsho(){};
+void ginsho(){};
+void keima(){};
+void kyosha(){};
+void fuhyo(){};
+void ryuo(){};
+void ryuma(){};
 
 void gameInit() {
 	const int tempType[20] = { 1,2,3,4,4,5,5,6,6,7,7,8,8,8,8,8,8,8,8,8 };
-	const int tempPos[20][2] = { {4,0},{1,1},{7,1},{3,0},{5,0},{2,0},{6,0},{1,0},{7,0},{0,0},{8,0},{0,2},{1,2},{2,2},{3,2},{4,2},{5,2},{6,2},{7,2},{8,2} };
+	const int tempPos[20][2] = { {4,0},{7,1},{1,1},{3,0},{5,0},{2,0},{6,0},{1,0},{7,0},{0,0},{8,0},{0,2},{1,2},{2,2},{3,2},{4,2},{5,2},{6,2},{7,2},{8,2} };
 	for (int i = 0; i < 20; i++) {
 		tokens[i].type = tempType[i];
 		tokens[i].pos[0] = tempPos[i][0];
@@ -66,46 +84,64 @@ void displayCaptured(bool side) {
 	printf("\n");
 }
 
+void maskGen(int type, int size, int x, int y) {
+
+}
+
+void previewGen() {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			preview[i][j] = ' ';
+	if(game[input.x][input.y].type)
+		if (game[input.x][input.y].promotion) {
+			if (game[input.x][input.y].type > 3)((void(*)())moveRule[4])();
+			else ((void(*)())moveRule[game[input.x][input.y].type + 6])();
+		}
+		else ((void(*)())moveRule[game[input.x][input.y].type - 1])();
+}
+
 void displayTable() {
 	placeChess();
-	for (int j = 0; j < 9; j++)input.x == j ? printf("   \033[7m%c\033[0m  ", xKey[j]) : printf("   %c  ", xKey[j]);
+	//preview[4][3] = 'x';
+	previewGen();
+	for (int j = 8; j >= 0; j--)input.x == j ? printf("   \033[7m%c\033[0m  ", xKey[8 - j]) : printf("   %c  ", xKey[8 - j]);
 	displayCaptured(1);
 	for (int i = 0; i < 9; i++) {
-		for (int j = 0; j < 9; j++) {
+		for (int j = 8; j >= 0; j--) {
 			if (i == 0)
-				if (j == 0)printf("%s", symbol[0]);
-				else if (j == 8)printf("%s", symbol[2]);
+				if (j == 8)printf("%s", symbol[0]);
+				else if (j == 0)printf("%s", symbol[2]);
 				else printf("%s", symbol[1]);
 			else
-				if (j == 0)printf("%s", symbol[4]);
-				else if (j == 8)printf("%s", symbol[6]);
+				if (j == 8)printf("%s", symbol[4]);
+				else if (j == 0)printf("%s", symbol[6]);
 				else printf("%s", symbol[5]);
 		}
 		printf("\n");
-		for (int j = 0; j < 9; j++) {
+		for (int j = 8; j >= 0; j--) {
 			printf("%s", symbol[3]);
-			if (game[8 - j][i].promotion)textRed;
-			if (game[8 - j][i].type) {
-				if (game[8 - j][i].side) {
-					printf("  %s", text[game[8 - j][i].type]);
+			if (game[j][i].promotion)textRed;
+			if (game[j][i].type) {
+				if (game[j][i].side) {
+					printf("  %s", text[game[j][i].type + game[j][i].promotion * 8]);
 					clearAtt;
-					printf("%c", preview[8 - j][i]);
+					printf("%c", preview[j][i]);
 				}
 				else {
-					i == input.y && 8 - j == input.x ? printf("  %s", symbol[14]) : printf("  %s", symbol[10]);
+					i == input.y && j == input.x ? printf("  \033[36;1m%s\033[0m", symbol[14]) : printf("  %s", symbol[10]);
 					clearAtt;
-					printf("%c", preview[8 - j][i]);
+					printf("%c", preview[j][i]);
 				}
 			}
-			else printf("    %c", preview[8 - j][i]);
+			else printf("    %c", preview[j][i]);
 		}
 		printf("%s\n", symbol[3]);
-		for (int j = 0; j < 9; j++) {
+		for (int j = 8; j >= 0; j--) {
 			printf("%s", symbol[3]);
-			if (game[8 - j][i].promotion)textRed;
-			if (game[8 - j][i].type) {
-				if (game[8 - j][i].side) i == input.y && 8 - j == input.x ? printf("  %s ", symbol[14]) : printf("  %s ", symbol[11]);
-				else printf("  %s ", text[game[8 - j][i].type]);
+			if (game[j][i].promotion)textRed;
+			if (game[j][i].type) {
+				if (game[j][i].side) i == input.y && j == input.x ? printf("  \033[36;1m%s\033[0m ", symbol[14]) : printf("  %s ", symbol[11]);
+				else printf("  %s ", text[game[j][i].type + game[j][i].promotion * 8]);
 				clearAtt;
 			}
 			else printf("     ");
@@ -113,9 +149,9 @@ void displayTable() {
 		printf("%s", symbol[3]);
 		i == input.y ? printf("  \033[7m%c\033[0m\n", yKey[i]) : printf("  %c\n", yKey[i]);
 	}
-	for (int j = 0; j < 9; j++) {
-		if (j == 0)printf("%s", symbol[7]);
-		else if (j == 8)printf("%s", symbol[9]);
+	for (int j = 8; j >= 0; j--) {
+		if (j == 8)printf("%s", symbol[7]);
+		else if (j == 0)printf("%s", symbol[9]);
 		else printf("%s", symbol[8]);
 	}
 	displayCaptured(0);
@@ -143,15 +179,15 @@ void rtGetKey() {
 	case '8': input.dir = 7; break;
 	case '9': input.dir = 8; break;
 
-	case 'q': input.x = 0; break;
-	case 'w': input.x = 1; break;
-	case 'e': input.x = 2; break;
-	case 'r': input.x = 3; break;
+	case 'o': input.x = 0; break;
+	case 'i': input.x = 1; break;
+	case 'u': input.x = 2; break;
+	case 'y': input.x = 3; break;
 	case 't': input.x = 4; break;
-	case 'y': input.x = 5; break;
-	case 'u': input.x = 6; break;
-	case 'i': input.x = 7; break;
-	case 'o': input.x = 8; break;
+	case 'r': input.x = 5; break;
+	case 'e': input.x = 6; break;
+	case 'w': input.x = 7; break;
+	case 'q': input.x = 8; break;
 
 	case 'a': input.y = 0; break;
 	case 's': input.y = 1; break;

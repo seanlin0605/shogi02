@@ -17,6 +17,17 @@ void moveTo(int n, int x, int y);
 void rtGetKey();
 void test();
 
+void gyokusho();
+void hisha();
+void kakugyo();
+void kinsho();
+void ginsho();
+void keima();
+void kyosha();
+void fuhyo();
+void ryuo();
+void ryuma();
+
 struct chessboard {
 	bool side;
 	bool promotion;
@@ -40,6 +51,5 @@ struct select {
 };
 
 struct moveRule {
-
 
 };
