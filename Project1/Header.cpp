@@ -4,8 +4,8 @@
 #include <math.h>
 #include <conio.h>
 
-const char* text[17] = { "  ", "玉", "飛", "角", "金", "銀", "桂", "香", "步", "王", "龍", "馬", "金", "全", "圭", "杏", "成" };
-const char* textp[16] = { "  ", "王", "龍", "馬", "金", "全", "圭", "杏", "と" };
+const char* text[17] = { "  ", "玉", "飛", "角", "金", "銀", "桂", "香", "步", "王", "龍", "馬", "金", "全", "圭", "杏", "成" };//"と"
+const char textp[16] = { ' ', '*', '+', '/', '-', '=', '6', '7', '8', '9' };
 const char* symbol[16] = { "┌─────", "┬─────", "┬─────┐", "│", "├─────", "┼─────", "┼─────┤", "└─────", "┴─────", "┴─────┘" ,"△", "▽", "▲", "▼", "◆" };//▲△▼▽◆◇
 const char xKey[10] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P' };
 const char yKey[10] = { 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L' };
@@ -19,25 +19,31 @@ select input;
 
 void gameInit() {
 	const int tempType[20] = { 1,2,3,4,4,5,5,6,6,7,7,8,8,8,8,8,8,8,8,8 };
-	const int tempPos[20][2] = { {4,0},{7,1},{1,1},{3,0},{5,0},{2,0},{6,0},{1,0},{7,0},{0,0},{8,0},{0,2},{1,2},{2,2},{3,2},{4,2},{5,2},{6,2},{7,2},{8,2} };
+	const int tempPos[20][2] = { {4,0},{7,4},{1,3},{3,0},{5,0},{2,0},{6,0},{1,0},{7,0},{0,0},{8,0},{0,5},{1,2},{2,2},{3,2},{4,2},{5,2},{6,2},{7,2},{8,2} };
 	for (int i = 0; i < 20; i++) {
 		tokens[i].type = tempType[i];
 		tokens[i].pos[0] = tempPos[i][0];
 		tokens[i].pos[1] = tempPos[i][1];
 		tokens[i].side = 1;
-		tokens[i].promotion = 1;
+		tokens[i].promotion = 0;
 		tokens[i].captured = 0;
 		int j = i + 20;
 		tokens[j].type = tempType[i];
 		tokens[j].pos[0] = 8 - tempPos[i][0];
 		tokens[j].pos[1] = 8 - tempPos[i][1];
 		tokens[j].side = 0;
-		tokens[j].promotion = 1;
+		tokens[j].promotion = 0;
 		tokens[j].captured = 0;
 	}
 	for (int i = 0; i < 9; i++)
 		for (int j = 0; j < 9; j++)
 			preview[i][j] = 0;
+	input.dir = 0;
+	input.dis = 0;
+	input.pro = 0;
+	input.etr = 0;
+	input.x = 4;
+	input.y = 4;
 	displayTable();
 }
 
@@ -76,7 +82,7 @@ void previewGen() {
 			preview[i][j] = 0;
 	if(game[input.x][input.y].type)
 		if (game[input.x][input.y].promotion) {
-			if (game[input.x][input.y].type > 3)((void(*)())moveRule[4])();
+			if (game[input.x][input.y].type > 3)((void(*)())moveRule[3])();
 			else ((void(*)())moveRule[game[input.x][input.y].type + 6])();
 		}
 		else ((void(*)())moveRule[game[input.x][input.y].type - 1])();
@@ -86,7 +92,7 @@ void displayTable() {
 	placeChess();
 	//preview[4][5] = 5;
 	previewGen();
-	for (int j = 8; j >= 0; j--)input.x == j ? printf("   \033[7m%c\033[0m  ", xKey[8 - j]) : printf("   %c  ", xKey[8 - j]);
+	for (int j = 8; j >= 0; j--)input.x == j ? printf("   %s%c%s  ", Inverse, xKey[8 - j], Clearr) : printf("   %c  ", xKey[8 - j]);
 	displayCaptured(1);
 	for (int i = 0; i < 9; i++) {
 		for (int j = 8; j >= 0; j--) {
@@ -102,34 +108,33 @@ void displayTable() {
 		printf("\n");
 		for (int j = 8; j >= 0; j--) {
 			printf("%s", symbol[3]);
-			if (game[j][i].promotion)textRed;
+			if (game[j][i].promotion)printf("%s", Bright);
 			if (game[j][i].type) {
 				if (game[j][i].side) {
-					printf("  %s", text[game[j][i].type + game[j][i].promotion * 8]);
-					clearAtt;
-					printf("%d", preview[j][i]);
+					printf("  %s%s%s", Blue, text[game[j][i].type + game[j][i].promotion * 8], Clearr);
+					printf("%c", textp[preview[j][i]]);
 				}
 				else {
-					i == input.y && j == input.x ? printf("  \033[36;1m%s\033[0m", symbol[14]) : printf("  %s", symbol[10]);
+					i == input.y && j == input.x ? printf("  %s%s%s", Magenta, symbol[14], Clearr) : printf("  %s%s%s", Red, symbol[10], Clearr);
 					clearAtt;
-					printf("%d", preview[j][i]);
+					printf("%c", textp[preview[j][i]]);
 				}
 			}
-			else printf("    %d", preview[j][i]);
+			else i == input.y && j == input.x ? printf("  %s%s%s ", Magenta, symbol[14], Clearr) : printf("    %c", textp[preview[j][i]]);
 		}
 		printf("%s\n", symbol[3]);
 		for (int j = 8; j >= 0; j--) {
 			printf("%s", symbol[3]);
-			if (game[j][i].promotion)textRed;
+			if (game[j][i].promotion)printf("%s", Bright);
 			if (game[j][i].type) {
-				if (game[j][i].side) i == input.y && j == input.x ? printf("  \033[36;1m%s\033[0m ", symbol[14]) : printf("  %s ", symbol[11]);
-				else printf("  %s ", text[game[j][i].type + game[j][i].promotion * 8]);
+				if (game[j][i].side) i == input.y && j == input.x ? printf("  %s%s%s ", Magenta, symbol[14], Clearr) : printf("  %s%s%s ", Blue, symbol[11], Clearr);
+				else printf("  %s%s%s ", Red, text[game[j][i].type + game[j][i].promotion * 8], Clearr);
 				clearAtt;
 			}
 			else printf("     ");
 		}
 		printf("%s", symbol[3]);
-		i == input.y ? printf("  \033[7m%c\033[0m\n", yKey[i]) : printf("  %c\n", yKey[i]);
+		i == input.y ? printf("  %s%c%s\n", Inverse, yKey[i], Clearr) : printf("  %c\n", yKey[i]);
 	}
 	for (int j = 8; j >= 0; j--) {
 		if (j == 8)printf("%s", symbol[7]);
@@ -140,124 +145,114 @@ void displayTable() {
 	gotoxy(0, 0);
 }
 
+void moveEnter() {
+	if (input.etr) {
+
+	}
+	input.etr = 0;
+}
+
 void moveTo(int n, int x, int y) {
 	tokens[n].pos[0] = x;
 	tokens[n].pos[1] = y;
 }
 
-void test() {
-	printf("%d %d %d\n", input.x, input.y, input.dir);
+void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t) {
+	tokens[n].pos[0] = x;
+	tokens[n].pos[1] = y;
+	tokens[n].captured = c;
+	tokens[n].promotion = p;
+	tokens[n].type = t;
+	tokens[n].side = s;
+}
+
+void moveBase(int ptr[][2], int len) {
+	for (int i = 0; i < len; i++) {
+		if (game[input.x][input.y].side) {
+			ptr[i][0] = -ptr[i][0];
+			ptr[i][1] = -ptr[i][1];
+		}
+		int tx = input.x + ptr[i][0], ty = input.y + ptr[i][1];
+		if (tx >= 0 && ty >= 0 && tx < 9 && ty < 9)
+			if (game[tx][ty].type) {
+				if (game[input.x][input.y].side != game[tx][ty].side)preview[tx][ty] = 5;
+			}
+			else preview[tx][ty] = 5;
+	}
+}
+
+void moveLong(int ptr[][2], int len) {
+	for (int i = 0; i < len; i++) {
+		if (game[input.x][input.y].side) {
+			ptr[i][0] = -ptr[i][0];
+			ptr[i][1] = -ptr[i][1];
+		}
+		for (int n = 1; n < 9; n++) {
+			int tx = input.x + (n * ptr[i][0]), ty = input.y + (n * ptr[i][1]);
+			if (tx >= 0 && ty >= 0 && tx < 9 && ty < 9)
+				if (game[tx][ty].type) {
+					if(game[input.x][input.y].side != game[tx][ty].side)preview[tx][ty] = 5;
+					break;
+				}
+				else preview[tx][ty] = 5;
+		}
+	}
 }
 
 void gyokusho() {
-	const int tempPos[8][2] = { {1,1},{0,1} ,{-1,1} ,{-1,0} ,{-1,-1} ,{0,-1} ,{1,-1} ,{1,0} };
+	int tempPos[8][2] = { {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1}, {0,-1} ,{1,-1} ,{1,0} };
 	for (int i = 0; i < 8; i++)
 		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i;
+			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i + 1;
 }
 
 void hisha() {
-	for (int i = 0; i < 9; i++)
-		for (int j = 0; j < 9; j++)
-			if (i == input.x || j == input.y) {
-				preview[i][j] = 5;
-			}
+	int tempPos[4][2] = { {0,1}, {-1,0}, {0,-1}, {1,0} };
+	moveLong(tempPos, 4);
 }
 
 void kakugyo() {
-	for (int i = 0; i < 9; i++)
-		for (int j = 0; j < 9; j++)
-			if (input.x - i == input.y - j || input.x - i == j - input.y) {
-				preview[i][j] = 5;
-			}
+	int tempPos[4][2] = { {1,1}, {-1,1}, {-1,-1}, {1,-1} };
+	moveLong(tempPos, 4);
 }
 
 void kinsho() {
-	int tempPos[6][2] = { {0,1} ,{-1,0} ,{-1,-1} ,{0,-1} ,{1,-1} ,{1,0} };
-	for (int i = 0; i < 6; i++) {
-		if (game[input.x][input.y].side) {
-			tempPos[i][0] = -tempPos[i][0];
-			tempPos[i][1] = -tempPos[i][1];
-		}
-		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i;
-	}
+	int tempPos[6][2] = { {0,1}, {-1,0}, {-1,-1}, {0,-1}, {1,-1}, {1,0} };
+	moveBase(tempPos, 6);
 }
 
 void ginsho() {
-	int tempPos[5][2] = { {1,1} ,{-1,1} ,{-1,-1} ,{0,-1} ,{1,-1} };
-	for (int i = 0; i < 5; i++) {
-		if (game[input.x][input.y].side) {
-			tempPos[i][0] = -tempPos[i][0];
-			tempPos[i][1] = -tempPos[i][1];
-		}
-		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i;
-	}
+	int tempPos[5][2] = { {1,1}, {-1,1}, {-1,-1}, {0,-1}, {1,-1} };
+	moveBase(tempPos, 5);
 }
 
 void keima() {
 	int tempPos[2][2] = { {1,-2}, {-1,-2} };
-	for (int i = 0; i < 2; i++) {
-		if (game[input.x][input.y].side) {
-			tempPos[i][0] = -tempPos[i][0];
-			tempPos[i][1] = -tempPos[i][1];
-		}
-		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = 5;
-	}
+	moveBase(tempPos, 2);
 }
 
 void kyosha() {
-	for (int i = 0; i < 9; i++)
-		for (int j = 0; j < 9; j++)
-			if (i == input.x && (((j - input.y > 0) && game[input.x][input.y].side) || ((j - input.y < 0) && !game[input.x][input.y].side))) {
-				preview[i][j] = 5;
-			}
+	int tempPos[][2] = { {0, -1} };
+	moveLong(tempPos, 1);
 }
 
 void fuhyo() {
-	int tempPos[2] = { 0, -1 };
-	if (game[input.x][input.y].side) {
-		tempPos[0] = -tempPos[0];
-		tempPos[1] = -tempPos[1];
-	}
-	if (input.x + tempPos[0] >= 0 && input.y + tempPos[1] >= 0 && input.x + tempPos[0] < 9 && input.y + tempPos[1] < 9)
-		preview[input.x + tempPos[0]][input.y + tempPos[1]] = 5;
+	int tempPos[][2] = { {0, -1} };
+	moveBase(tempPos, 1);
 }
 
 void ryuo() {
-	for (int i = 0; i < 9; i++)
-		for (int j = 0; j < 9; j++)
-			if (i == input.x || j == input.y) {
-				preview[i][j] = 5;
-			}
-	int tempPos[4][2] = { {1,1} ,{-1,1} ,{-1,-1} ,{1,-1} };
-	for (int i = 0; i < 4; i++) {
-		if (game[input.x][input.y].side) {
-			tempPos[i][0] = -tempPos[i][0];
-			tempPos[i][1] = -tempPos[i][1];
-		}
-		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i;
-	}
+	int tempPos1[4][2] = { {0,1}, {-1,0}, {0,-1}, {1,0} };
+	moveLong(tempPos1, 4);
+	int tempPos2[4][2] = { {1,1} ,{-1,1} ,{-1,-1} ,{1,-1} };
+	moveBase(tempPos2, 4);
 }
 
 void ryuma() {
-	for (int i = 0; i < 9; i++)
-		for (int j = 0; j < 9; j++)
-			if (input.x - i == input.y - j || input.x - i == j - input.y) {
-				preview[i][j] = 5;
-			}
-	int tempPos[4][2] = { {0,1} ,{-1,0} ,{0,-1} ,{1,0} };
-	for (int i = 0; i < 4; i++) {
-		if (game[input.x][input.y].side) {
-			tempPos[i][0] = -tempPos[i][0];
-			tempPos[i][1] = -tempPos[i][1];
-		}
-		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i;
-	}
+	int tempPos1[4][2] = { {1,1}, {-1,1}, {-1,-1}, {1,-1} };
+	moveLong(tempPos1, 4);
+	int tempPos2[4][2] = { {0,1} ,{-1,0} ,{0,-1} ,{1,0} };
+	moveBase(tempPos2, 4);
 }
 
 void rtGetKey() {

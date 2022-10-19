@@ -5,6 +5,7 @@
 
 int main() {
 	gameInit();
+	printf("\033[?25l");
 	while(true) {
 		rtGetKey();
 		//test();
