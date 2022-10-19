@@ -1,0 +1,132 @@
+input.dir = 0;
+	input.dis = 0;
+	input.pro = 0;
+	input.etr = 0;
+	input.x = 4;
+	input.y = 4;
+
+	collision(game[input.x][input.y].side);
+
+	void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t) {
+	tokens[n].pos[0] = x;
+	tokens[n].pos[1] = y;
+	tokens[n].captured = c;
+	tokens[n].promotion = p;
+	tokens[n].type = t;
+	tokens[n].side = s;
+}
+
+void moveEnter() {
+	if (input.etr) {
+
+	}
+	input.etr = 0;
+}
+
+void moveBase(int ptr[][2], int len) {
+	for (int i = 0; i < len; i++) {
+		if (game[input.x][input.y].side) {
+			ptr[i][0] = -ptr[i][0];
+			ptr[i][1] = -ptr[i][1];
+		}
+		if (input.x + ptr[i][0] >= 0 && input.y + ptr[i][1] >= 0 && input.x + ptr[i][0] < 9 && input.y + ptr[i][1] < 9)
+			preview[input.x + ptr[i][0]][input.y + ptr[i][1]] = 5;
+	}
+}
+
+void collision(bool side) {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			if (preview[i][j] && game[i][j].type && game[i][j].side == side)preview[i][j] = 0;
+}
+
+void gyokusho() {
+	const int tempPos[8][2] = { {1,1},{0,1} ,{-1,1} ,{-1,0} ,{-1,-1} ,{0,-1} ,{1,-1} ,{1,0} };
+	for (int i = 0; i < 8; i++)
+		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
+			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i + 1;
+}
+
+void hisha() {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			if (i == input.x || j == input.y) {
+				preview[i][j] = 5;
+			}
+}
+
+void kakugyo() {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			if (input.x - i == input.y - j || input.x - i == j - input.y) {
+				preview[i][j] = 5;
+			}
+}
+
+void kinsho() {
+	int tempPos[6][2] = { {0,1} ,{-1,0} ,{-1,-1} ,{0,-1} ,{1,-1} ,{1,0} };
+	moveBase(tempPos, 6);
+}
+
+void ginsho() {
+	int tempPos[5][2] = { {1,1} ,{-1,1} ,{-1,-1} ,{0,-1} ,{1,-1} };
+	moveBase(tempPos, 5);
+}
+
+void keima() {
+	int tempPos[2][2] = { {1,-2}, {-1,-2} };
+	moveBase(tempPos, 2);
+}
+
+void kyosha() {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			if (i == input.x && (((j - input.y > 0) && game[input.x][input.y].side) || ((j - input.y < 0) && !game[input.x][input.y].side))) {
+				preview[i][j] = 5;
+			}
+}
+
+void fuhyo() {
+	int tempPos[][2] = { {0, -1} };
+	moveBase(tempPos, 1);
+}
+
+void ryuo() {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			if (i == input.x || j == input.y) {
+				preview[i][j] = 5;
+			}
+	int tempPos[4][2] = { {1,1} ,{-1,1} ,{-1,-1} ,{1,-1} };
+	moveBase(tempPos, 4);
+}
+
+void ryuma() {
+	for (int i = 0; i < 9; i++)
+		for (int j = 0; j < 9; j++)
+			if (input.x - i == input.y - j || input.x - i == j - input.y) {
+				preview[i][j] = 5;
+			}
+	int tempPos[4][2] = { {0,1} ,{-1,0} ,{0,-1} ,{1,0} };
+	moveBase(tempPos, 4);
+}
+
+case '\n': input.etr = 1; break;
+
+#define Red "\033[31m"
+#define Blue "\033[36m"
+#define Magenta "\033[35m"
+#define Bright "\033[1m"
+#define Clearr "\033[0m"
+
+void collision(bool side);
+void moveBase(void* ptr, int len);
+
+void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t);
+
+bool etr;
+
+/*for (int i = 3; i < 12; i++)
+		{
+			moveTo(i, i - 3, 4);
+		}*/
