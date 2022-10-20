@@ -25,8 +25,9 @@ void moveBase(int ptr[][2], int len);
 void moveLong(int ptr[][2], int len);
 
 void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t);
-void moveTo(int n, int x, int y);
+void moveTo(int x, int y, int dx, int dy);
 void rtGetKey();
+void GetKey();
 
 void gyokusho();
 void hisha();
@@ -43,6 +44,7 @@ struct chessboard {
 	bool side;
 	bool promotion;
 	int type;
+	int num;
 };
 
 struct token {

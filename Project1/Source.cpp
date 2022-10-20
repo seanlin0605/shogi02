@@ -4,10 +4,12 @@
 
 
 int main() {
+	//printf("\033[?25l");
 	gameInit();
-	printf("\033[?25l");
 	while(true) {
-		rtGetKey();
+		//rtGetKey();
+		GetKey();
+		clear();
 		//test();
 		displayTable();
 		//moveTo(20, 5, 3);

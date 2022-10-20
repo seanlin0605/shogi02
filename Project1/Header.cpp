@@ -57,6 +57,7 @@ void placeChess() {
 			game[tokens[i].pos[0]][tokens[i].pos[1]].type = tokens[i].type;
 			game[tokens[i].pos[0]][tokens[i].pos[1]].side = tokens[i].side;
 			game[tokens[i].pos[0]][tokens[i].pos[1]].promotion = tokens[i].promotion;
+			game[tokens[i].pos[0]][tokens[i].pos[1]].num = i;
 		}
 	}
 }
@@ -70,10 +71,6 @@ void displayCaptured(bool side) {
 	for (int i = 1; i < 8; i++)
 		printf("%s:%d ", text[i + 1], temp[i]);
 	printf("\n");
-}
-
-void maskGen(int type, int size, int x, int y) {
-
 }
 
 void previewGen() {
@@ -152,9 +149,9 @@ void moveEnter() {
 	input.etr = 0;
 }
 
-void moveTo(int n, int x, int y) {
-	tokens[n].pos[0] = x;
-	tokens[n].pos[1] = y;
+void moveTo(int x, int y, int dx, int dy) {
+	tokens[game[x][y].num].pos[0] = dx;
+	tokens[game[x][y].num].pos[1] = dy;
 }
 
 void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t) {
@@ -253,6 +250,29 @@ void ryuma() {
 	moveLong(tempPos1, 4);
 	int tempPos2[4][2] = { {0,1} ,{-1,0} ,{0,-1} ,{1,0} };
 	moveBase(tempPos2, 4);
+}
+
+void GetKey() {
+	char tempStr[5][5] = {};
+	char tempChar;
+	int tempInt[2][2] = {};
+	for (int i = 0; i < 5; ) {
+		for (int j = 0; j < 5; j++) {
+			tempChar = getchar();
+			if (tempChar == '\n')break;
+			if (tempChar == ' ') {
+				i++;
+				break;
+			}
+			else tempStr[i][j] = tempChar;
+		}
+		if (tempChar == '\n')break;
+	}
+	for (int i = 0; i < 2; i++) {
+		tempInt[i][0] = tempStr[i][0] - 48;
+		tempInt[i][1] = tempStr[i][1] - 48;
+	}
+	moveTo(tempInt[0][0], tempInt[0][1], tempInt[1][0], tempInt[1][1]);
 }
 
 void rtGetKey() {
