@@ -19,7 +19,7 @@ select input;
 
 void gameInit() {
 	const int tempType[20] = { 1,2,3,4,4,5,5,6,6,7,7,8,8,8,8,8,8,8,8,8 };
-	const int tempPos[20][2] = { {4,0},{7,4},{1,3},{3,0},{5,0},{2,0},{6,0},{1,0},{7,0},{0,0},{8,0},{0,5},{1,2},{2,2},{3,2},{4,2},{5,2},{6,2},{7,2},{8,2} };
+	const int tempPos[20][2] = { {4,0},{7,1},{1,1},{3,0},{5,0},{2,0},{6,0},{1,0},{7,0},{0,0},{8,0},{0,2},{1,2},{2,2},{3,2},{4,2},{5,2},{6,2},{7,2},{8,2} };
 	for (int i = 0; i < 20; i++) {
 		tokens[i].type = tempType[i];
 		tokens[i].pos[0] = tempPos[i][0];
@@ -57,7 +57,7 @@ void placeChess() {
 			game[tokens[i].pos[0]][tokens[i].pos[1]].type = tokens[i].type;
 			game[tokens[i].pos[0]][tokens[i].pos[1]].side = tokens[i].side;
 			game[tokens[i].pos[0]][tokens[i].pos[1]].promotion = tokens[i].promotion;
-			game[tokens[i].pos[0]][tokens[i].pos[1]].num = i;
+			game[tokens[i].pos[0]][tokens[i].pos[1]].num = i + 1;
 		}
 	}
 }
@@ -87,8 +87,8 @@ void previewGen() {
 
 void displayTable() {
 	placeChess();
-	//preview[4][5] = 5;
 	previewGen();
+	gotoxy(0, 0);
 	for (int j = 8; j >= 0; j--)input.x == j ? printf("   %s%c%s  ", Inverse, xKey[8 - j], Clearr) : printf("   %c  ", xKey[8 - j]);
 	displayCaptured(1);
 	for (int i = 0; i < 9; i++) {
@@ -139,7 +139,6 @@ void displayTable() {
 		else printf("%s", symbol[8]);
 	}
 	displayCaptured(0);
-	gotoxy(0, 0);
 }
 
 void moveEnter() {
@@ -149,9 +148,21 @@ void moveEnter() {
 	input.etr = 0;
 }
 
-void moveTo(int x, int y, int dx, int dy) {
-	tokens[game[x][y].num].pos[0] = dx;
-	tokens[game[x][y].num].pos[1] = dy;
+void moveTo(int x, int y) {
+	previewGen();
+	if (preview[x][y]) {
+		if (game[x][y].num) {
+			tokens[game[x][y].num - 1].captured = 1;
+			tokens[game[x][y].num - 1].side = !tokens[game[x][y].num - 1].side;
+		}
+		tokens[game[input.x][input.y].num - 1].pos[0] = x;
+		tokens[game[input.x][input.y].num - 1].pos[1] = y;
+		if (!tokens[game[input.x][input.y].num - 1].promotion && ((!tokens[game[input.x][input.y].num - 1].side && y < 3) || (tokens[game[input.x][input.y].num - 1].side && y > 5))) {
+			gotoxy(62, 27);
+			printf("promotion?: ");
+			if (getchar() - 48)tokens[game[input.x][input.y].num - 1].promotion = 1;
+		}
+	}
 }
 
 void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t) {
@@ -256,6 +267,7 @@ void GetKey() {
 	char tempStr[5][5] = {};
 	char tempChar;
 	int tempInt[2][2] = {};
+	gotoxy(62, 27);
 	for (int i = 0; i < 5; ) {
 		for (int j = 0; j < 5; j++) {
 			tempChar = getchar();
@@ -272,7 +284,11 @@ void GetKey() {
 		tempInt[i][0] = tempStr[i][0] - 48;
 		tempInt[i][1] = tempStr[i][1] - 48;
 	}
-	moveTo(tempInt[0][0], tempInt[0][1], tempInt[1][0], tempInt[1][1]);
+	if (tempInt[0][0] < 9 && tempInt[0][0] >= 0 && tempInt[1][1] < 9 && tempInt[1][1] >= 0 && tempInt[0][1] < 9 && tempInt[0][1] >= 0 && tempInt[0][1] < 9 && tempInt[0][1] >= 0) {
+		input.x = tempInt[0][0];
+		input.y = tempInt[0][1];
+		moveTo(tempInt[1][0], tempInt[1][1]);
+	}
 }
 
 void rtGetKey() {

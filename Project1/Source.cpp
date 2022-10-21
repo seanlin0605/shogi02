@@ -10,9 +10,7 @@ int main() {
 		//rtGetKey();
 		GetKey();
 		clear();
-		//test();
 		displayTable();
-		//moveTo(20, 5, 3);
 	}
 	getchar();
 }
