@@ -144,10 +144,7 @@ void displayTable() {
 void moveTo(int x, int y) {
 	previewGen();
 	if (preview[x][y]) {
-		if (game[x][y].num) {
-			tokens[game[x][y].num - 1].captured = 1;
-			tokens[game[x][y].num - 1].side = !tokens[game[x][y].num - 1].side;
-		}
+		if (game[x][y].num)tokens[game[x][y].num - 1].captured = 1;
 		tokens[game[input.x][input.y].num - 1].pos[0] = x;
 		tokens[game[input.x][input.y].num - 1].pos[1] = y;
 		if (!tokens[game[input.x][input.y].num - 1].promotion && ((!tokens[game[input.x][input.y].num - 1].side && y < 3) || (tokens[game[input.x][input.y].num - 1].side && y > 5))) {
