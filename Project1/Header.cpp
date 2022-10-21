@@ -141,13 +141,6 @@ void displayTable() {
 	displayCaptured(0);
 }
 
-void moveEnter() {
-	if (input.etr) {
-
-	}
-	input.etr = 0;
-}
-
 void moveTo(int x, int y) {
 	previewGen();
 	if (preview[x][y]) {
