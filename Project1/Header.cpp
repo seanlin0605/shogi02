@@ -4,14 +4,17 @@
 #include <math.h>
 #include <conio.h>
 
-const char* text[17] = { "  ", "玉", "飛", "角", "金", "銀", "桂", "香", "步", "王", "龍", "馬", "金", "全", "圭", "杏", "成" };//"と"
+const char* text[17] = { "  ", "玉", "飛", "角", "金", "銀", "桂", "香", "步", "王", "龍", "馬", "金", "全", "圭", "杏", "to" };//"と"
+const char* textRom[17] = { "  ", "o", "hi", "kaku", "kin", "gin", "kei", "kyo", "fu", "王", "ryu", "uma", "金", "全", "圭", "杏", "to" };
 const char textp[16] = { ' ', '*', '+', '/', '-', '=', '6', '7', '8', '9' };
 const char* symbol[16] = { "┌─────", "┬─────", "┬─────┐", "│", "├─────", "┼─────", "┼─────┤", "└─────", "┴─────", "┴─────┘" ,"△", "▽", "▲", "▼", "◆" };//▲△▼▽◆◇
-const char xKey[10] = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P' };
-const char yKey[10] = { 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L' };
+//const char xKey[9] = { 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'W', 'Q' };
+//const char yKey[9] = { 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L' };
+const char xKey[9] = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+const char yKey[9] = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 const char dirKey[10] = { 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/' };
 void* moveRule[10] = { gyokusho, hisha, kakugyo, kinsho, ginsho, keima, kyosha, fuhyo ,ryuo ,ryuma };//gyokusho, hisha, kakugyo, kinsho, ginsho, keima, kyosha, fuhyo ,ryuo ,ryuma
-bool moveMask[9][9] = {};
+int captured[2][8] = {};
 int preview[9][9] = { };
 chessboard game[9][9];
 token tokens[40];
@@ -65,11 +68,14 @@ void placeChess() {
 void displayCaptured(bool side) {
 	int temp[8] = {};
 	for (int i = 0; i < 40; i++)
-		if (tokens[i].side != side && tokens[i].captured)
+		if (tokens[i].side != side && tokens[i].captured) {
 			temp[tokens[i].type - 1]++;
-	printf("      ");
+			captured[tokens[i].side][tokens[i].type]++;
+		}
+			
+	printf("   ");
 	for (int i = 1; i < 8; i++)
-		printf("%s:%d ", text[i + 1], temp[i]);
+		printf("%s%s%s%s:%d ", text[i + 1], Bright, textRom[i + 1], Clearr, temp[i]);
 	printf("\n");
 }
 
@@ -89,7 +95,7 @@ void displayTable() {
 	placeChess();
 	previewGen();
 	gotoxy(0, 0);
-	for (int j = 8; j >= 0; j--)input.x == j ? printf("   %s%c%s  ", Inverse, xKey[8 - j], Clearr) : printf("   %c  ", xKey[8 - j]);
+	for (int j = 8; j >= 0; j--)input.x == j ? printf("   %s%c%s  ", Inverse, xKey[j], Clearr) : printf("   %c  ", xKey[j]);
 	displayCaptured(1);
 	for (int i = 0; i < 9; i++) {
 		for (int j = 8; j >= 0; j--) {
@@ -142,17 +148,19 @@ void displayTable() {
 }
 
 void moveTo(int x, int y) {
-	previewGen();
-	if (preview[x][y]) {
-		if (game[x][y].num)tokens[game[x][y].num - 1].captured = 1;
-		tokens[game[input.x][input.y].num - 1].pos[0] = x;
-		tokens[game[input.x][input.y].num - 1].pos[1] = y;
-		if (!tokens[game[input.x][input.y].num - 1].promotion && ((!tokens[game[input.x][input.y].num - 1].side && y < 3) || (tokens[game[input.x][input.y].num - 1].side && y > 5))) {
-			gotoxy(62, 27);
-			printf("promotion?: ");
-			if (getchar() - 48)tokens[game[input.x][input.y].num - 1].promotion = 1;
+	if (input.x < 9 && input.x >= 0 && input.y < 9 && input.y >= 0 && x < 9 && x >= 0 && y < 9 && y >= 0) {
+		previewGen();
+		if (preview[x][y]) {
+			if (game[x][y].num)tokens[game[x][y].num - 1].captured = 1;
+			tokens[game[input.x][input.y].num - 1].pos[0] = x;
+			tokens[game[input.x][input.y].num - 1].pos[1] = y;
+			if (!tokens[game[input.x][input.y].num - 1].promotion && ((!tokens[game[input.x][input.y].num - 1].side && y < 3) || (tokens[game[input.x][input.y].num - 1].side && y > 5))) {
+				gotoxy(62, 27);
+				printf("promotion?: ");
+				if (getchar() - 48)tokens[game[input.x][input.y].num - 1].promotion = 1;
+			}
 		}
-	}
+	}else printf("Invalid input");
 }
 
 void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t) {
@@ -199,9 +207,7 @@ void moveLong(int ptr[][2], int len) {
 
 void gyokusho() {
 	int tempPos[8][2] = { {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1}, {0,-1} ,{1,-1} ,{1,0} };
-	for (int i = 0; i < 8; i++)
-		if (input.x + tempPos[i][0] >= 0 && input.y + tempPos[i][1] >= 0 && input.x + tempPos[i][0] < 9 && input.y + tempPos[i][1] < 9)
-			preview[input.x + tempPos[i][0]][input.y + tempPos[i][1]] = i + 1;
+	moveLong(tempPos, 8);
 }
 
 void hisha() {
@@ -256,7 +262,6 @@ void ryuma() {
 void GetKey() {
 	char tempStr[5][5] = {};
 	char tempChar;
-	int tempInt[2][2] = {};
 	gotoxy(62, 27);
 	for (int i = 0; i < 5; ) {
 		for (int j = 0; j < 5; j++) {
@@ -270,14 +275,34 @@ void GetKey() {
 		}
 		if (tempChar == '\n')break;
 	}
-	for (int i = 0; i < 2; i++) {
-		tempInt[i][0] = tempStr[i][0] - 48;
-		tempInt[i][1] = tempStr[i][1] - 48;
-	}
-	if (tempInt[0][0] < 9 && tempInt[0][0] >= 0 && tempInt[1][1] < 9 && tempInt[1][1] >= 0 && tempInt[0][1] < 9 && tempInt[0][1] >= 0 && tempInt[0][1] < 9 && tempInt[0][1] >= 0) {
+	int tempInt[2][2] = { {tempStr[0][0] - 49 ,tempStr[0][1] - 49},{tempStr[1][0] - 49 ,tempStr[1][1] - 49} };
+	switch (*tempInt[0]) {
+	case *"go":
+		moveTo(tempInt[1][0], tempInt[1][1]);
+		break;
+	case *"drop0":
+		for (int i = 0; i < 8; i++) {
+			if (*tempInt[1] == *text[i]) {
+				for (int j = 0; j < 40; j++) {
+					if (tokens[j].captured && !tokens[j].side && tokens[j].type == i) {
+						tokens[j].pos[0] = tempInt[1][0];
+						tokens[j].pos[1] = tempInt[1][1];
+						tokens[j].captured = 0;
+						tokens[j].side = 0;
+					}
+				}
+			}
+		}
+		input.x = tempInt[1][0];
+		input.y = tempInt[1][1];
+		if (in9(input.x) && in9(input.y))
+			previewGen();
+		break;
+	default:
 		input.x = tempInt[0][0];
 		input.y = tempInt[0][1];
 		moveTo(tempInt[1][0], tempInt[1][1]);
+		break;
 	}
 }
 
@@ -327,4 +352,9 @@ void rtGetKey() {
 	default:
 		break;
 	};
+}
+
+bool in9(int i) {
+	if (i < 9 && i >= 0)return 1;
+	else return 0;
 }

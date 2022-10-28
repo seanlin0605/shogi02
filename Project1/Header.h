@@ -9,6 +9,7 @@
 #define Inverse "\033[7m"
 #define Red "\033[31m"
 #define Blue "\033[36m"
+#define Blue2 "\033[34m"
 #define Magenta "\033[35m"
 #define Bright "\033[1m"
 #define Clearr "\033[0m"
@@ -28,6 +29,7 @@ void tokensTest(int n, int x, int y, bool s, bool p, bool c, int t);
 void moveTo(int x, int y, int dx, int dy);
 void rtGetKey();
 void GetKey();
+bool in9(int i);
 
 void gyokusho();
 void hisha();
